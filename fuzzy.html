@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSC649 Fuzzy Expert Systems: interactive study page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1E2A2E; --muted:#56676C; --paper:#F5F8F8; --panel:#FFFFFF; --line:#D6E2E3;
+  --brand:#0E6E73; --brand-soft:#E3F0F0; --a:#0E6E73; --b:#C2701F; --c:#7A4FA0; --ok:#2E7D4F; --bad:#B23A3A; --focus:#1D6FA5;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ink:#E4EEEF; --muted:#A3B6B9; --paper:#121C1E; --panel:#1B282B; --line:#2E4246;
+    --brand:#5CC2C7; --brand-soft:#1F3538; --a:#5CC2C7; --b:#E7A05A; --c:#B794D8; --ok:#6CC08F; --bad:#E07A7A; --focus:#7FB8E6; color-scheme: dark; }
+}
+*{box-sizing:border-box} [hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important} }
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Sans 3",Arial,sans-serif;font-size:18px;line-height:1.55}
+a{color:var(--brand)} :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+header.top{padding:40px 0 8px}
+.course{color:var(--muted);font-weight:600;margin:0 0 6px}
+h1{font-size:44px;line-height:1.1;margin:0 0 14px;letter-spacing:-0.01em}
+h2{font-size:30px;line-height:1.2;margin:0 0 8px} h3{font-size:21px;margin:22px 0 6px}
+p{margin:0 0 12px;max-width:72ch} .lead{font-size:20px;color:var(--muted);max-width:66ch}
+code,.mono{font-family:"JetBrains Mono","Courier New",monospace;font-size:0.88em}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:28px;align-items:start;margin:28px 0 12px}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+.controls{display:flex;flex-direction:column;gap:16px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{font:inherit;font-size:16px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--paper)}
+label.ctl{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:16px}
+label.ctl span.val{font-weight:400;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--brand)}
+.result{background:var(--brand);color:var(--paper);border-radius:14px;padding:14px 18px}
+.result b{display:block;font-size:34px;line-height:1.1}
+.result small{opacity:.85;font-size:14px}
+table.cmp{border-collapse:collapse;width:100%;font-size:16px;margin-top:8px}
+table.cmp th,table.cmp td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+table.cmp th{color:var(--muted);font-weight:600}
+.tablewrap{overflow-x:auto}
+tr.fired td{font-weight:600}
+tr.off td{color:var(--muted)}
+.hint{font-size:16px;color:var(--muted);background:var(--panel);border-left:4px solid var(--brand);padding:10px 14px;border-radius:0 10px 10px 0}
+.progress{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 24px;margin:28px 0}
+.progress ol{margin:10px 0 0;padding-left:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px 24px}
+.progress li label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:16px}
+.progress input{margin-top:5px;accent-color:var(--brand);width:18px;height:18px}
+.bar{height:10px;background:var(--brand-soft);border-radius:999px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .3s}
+nav.units{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+nav.units a{font-size:15px;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--ink);background:var(--panel)}
+section.unit{border-top:1px solid var(--line);padding:44px 0 20px}
+.unit-head{display:flex;gap:16px;align-items:baseline}
+.num{font-weight:700;color:var(--brand);font-size:30px;min-width:1.6em}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;margin-top:14px}
+.demo{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:18px}
+.demo h3{margin-top:0}
+.demo svg,.ex svg{max-width:640px;display:block}
+ul.key{margin:0;padding-left:20px} ul.key li{margin-bottom:6px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+.card h3{margin-top:0}
+.out{font-weight:700;color:var(--brand)}
+/* exercises */
+.ex{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin-top:14px}
+.ex .tag{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--brand);margin-bottom:4px}
+.ans{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.ans input{width:110px;font:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.ans button,.reveal{font:inherit;font-size:16px;padding:6px 14px;border-radius:8px;border:1px solid var(--brand);background:transparent;color:var(--brand);cursor:pointer}
+.fb{font-size:16px} .fb.right{color:var(--ok)} .fb.wrong{color:var(--bad)}
+details{margin-top:8px} summary{cursor:pointer;color:var(--brand);font-weight:600}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts button{text-align:left;font:inherit;font-size:17px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.opts button.right{border-color:var(--ok)} .opts button.wrong{border-color:var(--bad)}
+footer{color:var(--muted);font-size:15px;padding:40px 0 60px;border-top:1px solid var(--line);margin-top:40px}
+@media (max-width:860px){ h1{font-size:34px} .sim,.grid2,.cards{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <p class="course">CSC649, Uncertainty and Fuzzy Expert Systems</p>
+  <h1>How a fuzzy expert system thinks</h1>
+  <p class="lead">A fuzzy system reasons with words like <i>warm</i> and <i>humid</i>, the way people do. Move the inputs below and watch all four steps of Mamdani inference happen: fuzzification, rule evaluation, aggregation and defuzzification. The exercises on this page are for practice only; nothing needs to be submitted.</p>
+</header>
+
+<div class="sim" id="sim">
+  <div class="stage">
+    <svg id="mfSvg" viewBox="0 0 640 520" width="100%" role="img" aria-label="Membership functions for temperature, humidity and fan speed, with the current inputs, clipped rule outputs and the centroid"></svg>
+  </div>
+  <div class="controls">
+    <label class="ctl">Temperature (°C) <span class="val" id="tVal">28</span><input type="range" id="temp" min="0" max="40" step="0.5" value="28"></label>
+    <label class="ctl">Humidity (%) <span class="val" id="hVal">60</span><input type="range" id="hum" min="0" max="100" value="60"></label>
+    <div>
+      <p style="font-weight:600;margin-bottom:6px">Inference method</p>
+      <div class="seg" id="methSeg" role="group" aria-label="Choose the inference method">
+        <button data-v="clip" aria-pressed="true">Mamdani: clipping</button>
+        <button data-v="scale" aria-pressed="false">Mamdani: scaling</button>
+        <button data-v="sugeno" aria-pressed="false">Sugeno</button>
+      </div>
+    </div>
+    <div class="result"><b id="fanOut">–</b><small id="fanMethod">Fan speed (%), centroid of the aggregated set</small></div>
+    <p class="hint" id="simHint">Try 28 °C and 60% humidity, then make it hotter. Watch which rules fire in the table below the chart.</p>
+  </div>
+</div>
+<div class="tablewrap"><table class="cmp" id="ruleTable" aria-label="Rule evaluation">
+  <thead><tr><th>Rule</th><th>IF temperature is</th><th>AND humidity is</th><th>THEN fan speed is</th><th>Firing strength</th></tr></thead><tbody></tbody></table></div>
+<p style="font-size:15px;color:var(--muted);margin-top:8px">The membership functions here are an example. Your MATLAB tutorial may use slightly different shapes and ranges, so its numbers can differ.</p>
+
+<section class="progress" aria-labelledby="planTitle">
+  <h2 id="planTitle">How to use this page</h2>
+  <p>Work through the sections in order during or after the lecture. Tick each one as you finish; ticks are saved in this browser only.</p>
+  <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+  <p id="progText" style="font-size:15px;color:var(--muted);margin-top:6px"></p>
+  <ol id="checklist"></ol>
+  <nav class="units" aria-label="Jump to a section">
+    <a href="#s1">Uncertainty</a><a href="#s2">Crisp vs fuzzy</a><a href="#s3">Hedges</a><a href="#s4">Fuzzy rules</a><a href="#s5">Mamdani</a><a href="#s6">Sugeno</a><a href="#s7">Building a system</a><a href="#s8">MATLAB</a><a href="#s9">Review</a>
+  </nav>
+</section>
+
+<section class="unit" id="s1">
+  <div class="unit-head"><span class="num">1</span><h2>Uncertainty</h2></div>
+  <p>Uncertainty is the lack of the exact knowledge that would let us reach a perfectly reliable conclusion. Expert systems meet it from four sources:</p>
+  <div class="cards">
+    <div class="card"><h3>Weak implications</h3><p>The link between a condition (IF) and an action (THEN) is not certain.</p></div>
+    <div class="card"><h3>Imprecise language</h3><p>Words such as <i>often</i>, <i>sometimes</i> or <i>hardly ever</i> mean different things to different people.</p></div>
+    <div class="card"><h3>Unknown data</h3><p>Data is missing or incomplete, so the system must reason with approximate values.</p></div>
+    <div class="card"><h3>Combining experts</h3><p>Different experts give different, sometimes conflicting, views.</p></div>
+  </div>
+  <p style="margin-top:14px">Fuzzy logic handles the <b>imprecise language</b> problem: it lets the system use vague words in a precise, mathematical way.</p>
+  <div class="ex" data-mcq="u1"></div>
+</section>
+
+<section class="unit" id="s2">
+  <div class="unit-head"><span class="num">2</span><h2>Crisp sets vs fuzzy sets: "tall men"</h2></div>
+  <p>In a <b>crisp</b> (Boolean) set, a man is either tall (1) or not (0), with a sharp line at 180 cm. In a <b>fuzzy</b> set, every man belongs to "tall" to some <b>degree of membership</b> between 0 and 1.</p>
+  <div class="demo">
+    <h3>Try it: move the height</h3>
+    <svg id="tallSvg" viewBox="0 0 620 260" width="100%" role="img" aria-label="Crisp and fuzzy membership functions for tall men with the selected height marked"></svg>
+    <label class="ctl">Height (cm) <span class="val" id="htVal">179</span><input type="range" id="ht" min="150" max="210" value="179"></label>
+    <p>Crisp membership: <span class="out" id="crispOut">–</span> &nbsp;·&nbsp; Fuzzy membership: <span class="out" id="fuzzyOut">–</span></p>
+    <p style="font-size:16px;color:var(--muted)">The fuzzy curve follows the "tall men" table in the lecture (e.g. Tom, 181 cm → 0.82; David, 179 cm → 0.78; Mike, 172 cm → 0.24).</p>
+  </div>
+  <div class="ex">
+    <span class="tag">Exercise 2.1</span>
+    <p>Using the slider, what is the fuzzy membership of a man who is <b>179 cm</b> in "tall"? And his crisp membership?</p>
+    <div class="ans"><label>Fuzzy: <input data-check="0.78" data-tol="0.02" aria-label="Fuzzy membership"></label><label>Crisp: <input data-check="0" data-tol="0" aria-label="Crisp membership"></label><button type="button" class="chk">Check</button><span class="fb" aria-live="polite"></span></div>
+    <details><summary>Why does this matter?</summary><p>David (179 cm) and Tom (181 cm) are only 2 cm apart. A crisp set calls one "not tall" and the other "tall"; a fuzzy set gives them similar degrees (0.78 and 0.82), which matches how people actually think.</p></details>
+  </div>
+</section>
+
+<section class="unit" id="s3">
+  <div class="unit-head"><span class="num">3</span><h2>Linguistic variables and hedges</h2></div>
+  <p>A <b>linguistic variable</b> takes words as values: <i>height</i> can be <i>short</i>, <i>average</i> or <i>tall</i>. <b>Hedges</b> such as <i>very</i>, <i>somewhat</i> and <i>extremely</i> modify a fuzzy set mathematically.</p>
+  <div class="demo">
+    <h3>Try it: apply hedges to "tall"</h3>
+    <label class="ctl">Height (cm) <span class="val" id="h2Val">181</span><input type="range" id="h2" min="150" max="210" value="181"></label>
+    <div class="tablewrap"><table class="cmp" id="hedgeTable"><thead><tr><th>Hedge</th><th>Formula</th><th>Membership</th></tr></thead><tbody></tbody></table></div>
+    <p style="font-size:16px;color:var(--muted);margin-top:8px">Concentration hedges (very, extremely) make the set stricter, so values drop; dilation hedges (somewhat, more or less) make it looser, so values rise.</p>
+  </div>
+  <div class="ex">
+    <span class="tag">Exercise 3.1</span>
+    <p>Tom's membership in "tall" is 0.82. Calculate his membership in <b>very tall</b> and in <b>somewhat tall</b> (2 decimal places).</p>
+    <div class="ans"><label>Very tall: <input data-check="0.67" data-tol="0.01" aria-label="Very tall"></label><label>Somewhat tall: <input data-check="0.91" data-tol="0.01" aria-label="Somewhat tall"></label><button type="button" class="chk">Check</button><span class="fb" aria-live="polite"></span></div>
+    <details><summary>Show working</summary><p>Very: 0.82² = 0.6724 ≈ 0.67. Somewhat: √0.82 = 0.9055 ≈ 0.91.</p></details>
+  </div>
+</section>
+
+<section class="unit" id="s4">
+  <div class="unit-head"><span class="num">4</span><h2>Fuzzy rules and fuzzy operators</h2></div>
+  <div class="grid2">
+    <div>
+      <p>A fuzzy rule has the form <b>IF x is A THEN y is B</b>, where A and B are linguistic values (fuzzy sets).</p>
+      <p>A classical rule fires completely or not at all. A fuzzy rule fires <b>to a degree</b>: if the antecedent is partly true, the consequent is partly true by the same degree.</p>
+    </div>
+    <div class="tablewrap"><table class="cmp">
+      <thead><tr><th>Operator</th><th>Fuzzy version</th><th>Example (0.2 and 0.7)</th></tr></thead>
+      <tbody><tr><td>AND</td><td>min(μA, μB)</td><td>0.2</td></tr><tr><td>OR</td><td>max(μA, μB)</td><td>0.7</td></tr><tr><td>NOT</td><td>1 − μA</td><td>NOT 0.2 = 0.8</td></tr></tbody></table></div>
+  </div>
+  <div class="ex">
+    <span class="tag">Exercise 4.1</span>
+    <p>Rule: IF project funding is <i>marginal</i> AND project staffing is <i>large</i> THEN risk is <i>normal</i>. The memberships are μ(marginal) = 0.2 and μ(large) = 0.7. What is the firing strength of the rule?</p>
+    <div class="ans"><input data-check="0.2" data-tol="0.001" aria-label="Firing strength"><button type="button" class="chk">Check</button><span class="fb" aria-live="polite"></span></div>
+    <details><summary>Show working</summary><p>AND uses the minimum: min(0.2, 0.7) = 0.2.</p></details>
+  </div>
+  <div class="ex" data-mcq="r1"></div>
+</section>
+
+<section class="unit" id="s5">
+  <div class="unit-head"><span class="num">5</span><h2>Mamdani inference: the lecture example step by step</h2></div>
+  <p>The lecture's two-input example estimates <b>project risk</b> (z) from <b>project funding</b> (x) and <b>project staffing</b> (y):</p>
+  <div class="tablewrap"><table class="cmp">
+    <thead><tr><th>Rule</th><th>Statement</th></tr></thead>
+    <tbody><tr><td>1</td><td>IF funding is <i>adequate</i> (A3) OR staffing is <i>small</i> (B1) THEN risk is <i>low</i> (C1)</td></tr>
+    <tr><td>2</td><td>IF funding is <i>marginal</i> (A2) AND staffing is <i>large</i> (B2) THEN risk is <i>normal</i> (C2)</td></tr>
+    <tr><td>3</td><td>IF funding is <i>inadequate</i> (A1) THEN risk is <i>high</i> (C3)</td></tr></tbody></table></div>
+
+  <div class="ex">
+    <span class="tag">Step 1: Fuzzification</span>
+    <p>The crisp inputs give: μ(A1) = 0.5, μ(A2) = 0.2, μ(A3) = 0.0; μ(B1) = 0.1, μ(B2) = 0.7. These are given; move on to step 2.</p>
+  </div>
+  <div class="ex">
+    <span class="tag">Step 2: Rule evaluation</span>
+    <p>Calculate the firing strength of each rule.</p>
+    <div class="ans"><label>Rule 1: <input data-check="0.1" data-tol="0.001" aria-label="Rule 1 strength"></label><label>Rule 2: <input data-check="0.2" data-tol="0.001" aria-label="Rule 2 strength"></label><label>Rule 3: <input data-check="0.5" data-tol="0.001" aria-label="Rule 3 strength"></label><button type="button" class="chk">Check</button><span class="fb" aria-live="polite"></span></div>
+    <details><summary>Show working</summary><p>Rule 1 uses OR: max(0.0, 0.1) = 0.1. Rule 2 uses AND: min(0.2, 0.7) = 0.2. Rule 3 has one antecedent: 0.5.</p></details>
+  </div>
+  <div class="ex">
+    <span class="tag">Step 3: Aggregation</span>
+    <p>Each rule's output set is <b>clipped</b> at its firing strength (low at 0.1, normal at 0.2, high at 0.5), and the clipped sets are combined (union) into one fuzzy set. <b>Scaling</b> is the alternative: the output set is multiplied by the firing strength instead, which keeps its shape.</p>
+    <svg id="aggSvg" viewBox="0 0 620 220" width="100%" role="img" aria-label="Aggregated output: 0.1 from 0 to 20, 0.2 from 30 to 60, 0.5 from 70 to 100, with the centroid at 67.4"></svg>
+  </div>
+  <div class="ex">
+    <span class="tag">Step 4: Defuzzification (centre of gravity)</span>
+    <p>Using the sample points from the lecture: membership 0.1 at z = 0, 10, 20; 0.2 at z = 30, 40, 50, 60; 0.5 at z = 70, 80, 90, 100. Calculate the COG (1 decimal place).</p>
+    <p class="mono">COG = Σ z·μ(z) / Σ μ(z)</p>
+    <div class="ans"><input data-check="67.4" data-tol="0.1" aria-label="Centre of gravity"><button type="button" class="chk">Check</button><span class="fb" aria-live="polite"></span></div>
+    <details><summary>Show working</summary><p>Numerator: (0+10+20)×0.1 + (30+40+50+60)×0.2 + (70+80+90+100)×0.5 = 3 + 36 + 170 = 209.<br>Denominator: 0.1×3 + 0.2×4 + 0.5×4 = 3.1.<br>COG = 209 / 3.1 = <b>67.4</b>: the project risk is 67.4%.</p></details>
+  </div>
+</section>
+
+<section class="unit" id="s6">
+  <div class="unit-head"><span class="num">6</span><h2>Sugeno inference</h2></div>
+  <div class="grid2">
+    <div>
+      <p>Sugeno inference uses the same first two steps, but each rule's consequent is a <b>single number</b> (a singleton), e.g. <i>IF x is A AND y is B THEN z is k</i>.</p>
+      <p>Defuzzification becomes a simple <b>weighted average</b>, so Sugeno is faster than Mamdani's centroid calculation.</p>
+    </div>
+    <div class="card"><h3>Mamdani or Sugeno?</h3>
+      <ul class="key"><li><b>Mamdani:</b> intuitive and close to how experts describe knowledge; more computation.</li>
+      <li><b>Sugeno:</b> computationally efficient; works well with optimisation and adaptive techniques, so it suits control and dynamic nonlinear systems.</li></ul></div>
+  </div>
+  <div class="ex">
+    <span class="tag">Exercise 6.1</span>
+    <p>For the project risk example, the Sugeno constants are k1 = 20 (low), k2 = 50 (normal) and k3 = 80 (high), with the same firing strengths 0.1, 0.2 and 0.5. Calculate the weighted average.</p>
+    <p class="mono">WA = (0.1×20 + 0.2×50 + 0.5×80) / (0.1 + 0.2 + 0.5)</p>
+    <div class="ans"><input data-check="65" data-tol="0.1" aria-label="Weighted average"><button type="button" class="chk">Check</button><span class="fb" aria-live="polite"></span></div>
+    <details><summary>Show working</summary><p>(2 + 10 + 40) / 0.8 = 52 / 0.8 = <b>65</b>. Compare with Mamdani's 67.4: close, but not identical.</p></details>
+  </div>
+  <div class="ex">
+    <span class="tag">Exercise 6.2</span>
+    <p>In the simulator at the top, set 30 °C and 75% humidity. Compare the fan speed from <b>Mamdani: clipping</b>, <b>Mamdani: scaling</b> and <b>Sugeno</b>. Which method gives the highest value, and why might they differ?</p>
+    <details><summary>Show a model answer</summary><p>All three give a high fan speed because the "hot" and "high humidity" rules fire strongly. The values differ slightly because clipping, scaling and Sugeno's weighted average turn the same rule strengths into a single number in different ways: clipping keeps the flat tops of the output sets, scaling keeps their original shapes, and Sugeno uses only one representative value per output.</p></details>
+  </div>
+</section>
+
+<section class="unit" id="s7">
+  <div class="unit-head"><span class="num">7</span><h2>Building a fuzzy expert system</h2></div>
+  <p>The lecture's case study advises a service centre manager on how many spare parts to keep. Development follows five steps:</p>
+  <div class="tablewrap"><table class="cmp">
+    <thead><tr><th>Step</th><th>What you do</th><th>In the service centre case</th></tr></thead>
+    <tbody>
+      <tr><td>1. Specify the problem and linguistic variables</td><td>Decide inputs, output and their ranges</td><td>Mean delay, number of servers, repair utilisation factor → number of spares</td></tr>
+      <tr><td>2. Determine fuzzy sets</td><td>Choose shapes (triangles and trapezoids are simplest)</td><td>e.g. delay: very short, short, medium</td></tr>
+      <tr><td>3. Elicit and construct fuzzy rules</td><td>Get rules from experts, documents or observation</td><td>A rule table or rule base</td></tr>
+      <tr><td>4. Encode into the system</td><td>Use a language or a tool</td><td>MATLAB Fuzzy Logic Toolbox</td></tr>
+      <tr><td>5. Evaluate and tune</td><td>Test against requirements and adjust sets or rules</td><td>Check output surfaces; adjust overlap and rule weights</td></tr>
+    </tbody></table></div>
+  <div class="ex" data-mcq="b1"></div>
+</section>
+
+<section class="unit" id="s8">
+  <div class="unit-head"><span class="num">8</span><h2>Practise in MATLAB (tutorial, no submission)</h2></div>
+  <p>Build the same fan controller as the simulator at the top, in MATLAB Online:</p>
+  <ol>
+    <li>Go to <a href="https://matlab.mathworks.com/" target="_blank" rel="noopener">matlab.mathworks.com</a> and type <code>fuzzyLogicDesigner</code> in the command window.</li>
+    <li>Create a <b>Mamdani Type-1</b> FIS with inputs <b>Temperature</b> (0–40) and <b>Humidity</b> (0–100), and output <b>FanSpeed</b> (0–100).</li>
+    <li>Add three membership functions to each variable, as in the simulator: cold/warm/hot, low/medium/high, slow/medium/fast.</li>
+    <li>Enter the seven rules from the rule table at the top of this page.</li>
+    <li>Open the <b>Rule Inference</b> view, set 28 °C and 60%, and compare MATLAB's fan speed with the simulator.</li>
+    <li>Open the <b>Control Surface</b> view and describe how fan speed changes with temperature and humidity.</li>
+  </ol>
+  <div class="ex">
+    <span class="tag">Exercise 8.1</span>
+    <p>If MATLAB gives a different fan speed from the simulator for the same inputs, list two possible reasons.</p>
+    <details><summary>Show a model answer</summary><p>(1) The membership function shapes or ranges are different. (2) The rules or operators are different (e.g. a different AND method, implication or aggregation). (3) A different defuzzification method is selected (centroid vs bisector or mean of maximum).</p></details>
+  </div>
+</section>
+
+<section class="unit" id="s9">
+  <div class="unit-head"><span class="num">9</span><h2>Review questions</h2></div>
+  <p>Try answering each question yourself first, then open the model answer.</p>
+  <div class="ex"><p><b>1. What is an expert system?</b></p><details><summary>Model answer</summary><p>A computer program that captures the knowledge of human experts in a narrow domain, usually as IF–THEN rules, and uses it to solve problems or give advice as an expert would.</p></details></div>
+  <div class="ex"><p><b>2. What is uncertainty?</b></p><details><summary>Model answer</summary><p>The lack of the exact knowledge that would let us reach a perfectly reliable conclusion. Sources include weak implications, imprecise language, unknown data and differing expert opinions.</p></details></div>
+  <div class="ex"><p><b>3. What is a fuzzy expert system?</b></p><details><summary>Model answer</summary><p>An expert system that uses fuzzy sets and fuzzy IF–THEN rules, with degrees of membership instead of true/false values, to reason with vague and imprecise information.</p></details></div>
+  <div class="ex"><p><b>4. What type of problem suits a fuzzy expert system?</b></p><details><summary>Model answer</summary><p>Problems where knowledge is expressed in vague words, inputs change gradually, and an exact mathematical model is hard to build: for example control (fans, washing machines, air conditioning), risk assessment and decision support.</p></details></div>
+</section>
+
+<footer>CSC649 self-study page: Uncertainty and Fuzzy Expert Systems. For practice during and after the lecture; exercises are not submitted.</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const store = { get(k,d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+
+/* ---------- Checklist ---------- */
+const KEY = "csc649fuzzy";
+const STEPS = ["Play with the simulator at the top","1 Uncertainty","2 Crisp vs fuzzy sets","3 Linguistic variables and hedges","4 Fuzzy rules and operators","5 Mamdani inference (4 steps)","6 Sugeno inference","7 Building a fuzzy expert system","8 MATLAB tutorial","9 Review questions"];
+STEPS.forEach((s,i) => { const li = document.createElement("li");
+  li.innerHTML = `<label><input type="checkbox" ${store.get(KEY,[]).includes(i)?"checked":""}><span>${s}</span></label>`;
+  li.querySelector("input").addEventListener("change", e => { const set = new Set(store.get(KEY,[])); e.target.checked ? set.add(i) : set.delete(i); store.set(KEY,[...set]); bar(); });
+  $("#checklist").appendChild(li); });
+function bar(){ const n = store.get(KEY,[]).length; $("#barFill").style.width = (100*n/STEPS.length)+"%"; $("#progText").textContent = `${n} of ${STEPS.length} sections done`; }
+bar();
+
+/* ---------- Membership functions ---------- */
+const trap = (a,b,c,d) => x => x<=a||x>=d ? (x===a&&a===b?1:x===d&&c===d?1:0) : x<b ? (x-a)/(b-a) : x<=c ? 1 : (d-x)/(d-c);
+const tri = (a,b,c) => trap(a,b,b,c);
+const T = { Cold: trap(-1,0,10,20), Warm: tri(10,20,30), Hot: trap(20,30,40,41) };
+const H = { Low: trap(-1,0,30,50), Medium: tri(30,50,70), High: trap(50,70,100,101) };
+const O = { Slow: trap(-1,0,20,40), Medium: tri(30,50,70), Fast: trap(60,80,100,101) };
+const SUG = { Slow: 20, Medium: 50, Fast: 85 };
+const RULES = [["Cold",null,"Slow"],["Warm","Low","Slow"],["Warm","Medium","Medium"],["Warm","High","Fast"],["Hot","Low","Medium"],["Hot","Medium","Fast"],["Hot","High","Fast"]];
+const COL = { Cold:"--a", Warm:"--b", Hot:"--c", Low:"--a", Medium:"--b", High:"--c", Slow:"--a", Fast:"--c" };
+let method = "clip";
+const tb = $("#ruleTable tbody");
+RULES.forEach((r,i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i+1}</td><td>${r[0]}</td><td>${r[1] ?? "(any)"}</td><td>${r[2]}</td><td class="st"></td>`; tb.appendChild(tr); });
+
+function mfPanel(y0, h, lo, hi, sets, xval, label, unit){
+  const X = v => 60 + (v-lo)/(hi-lo)*540, Y = m => y0 + h - m*h;
+  let s = `<text x="60" y="${y0-8}" font-size="16" font-weight="700" fill="${css("--ink")}">${label}</text>`;
+  s += `<line x1="60" y1="${Y(0)}" x2="600" y2="${Y(0)}" stroke="${css("--line")}" stroke-width="2"/>`;
+  for (const [name,f] of Object.entries(sets)){
+    let p = ""; for (let i=0;i<=200;i++){ const v = lo + (hi-lo)*i/200; p += `${X(v).toFixed(1)},${Y(f(v)).toFixed(1)} `; }
+    s += `<polyline points="${p}" fill="none" stroke="${css(COL[name])}" stroke-width="2.5"/>`;
+  }
+  Object.keys(sets).forEach((name,i) => { s += `<rect x="${430+i*68}" y="${y0-20}" width="14" height="4" fill="${css(COL[name])}"/><text x="${448+i*68}" y="${y0-14}" font-size="13" fill="${css(COL[name])}">${name}</text>`; });
+  for (let k=0;k<=4;k++){ const v = lo + (hi-lo)*k/4; s += `<text x="${X(v)}" y="${Y(0)+16}" font-size="12" text-anchor="middle" fill="${css("--muted")}">${v}</text>`; }
+  if (xval !== null){
+    s += `<line x1="${X(xval)}" y1="${y0}" x2="${X(xval)}" y2="${Y(0)}" stroke="${css("--ink")}" stroke-width="2" stroke-dasharray="6 5"/>`;
+    const used = [];
+    for (const [name,f] of Object.entries(sets)){ const m = f(xval); if (m>0){ let ty = Y(m)-4; while (used.some(u => Math.abs(u-ty) < 15)) ty += 16; used.push(ty);
+      s += `<circle cx="${X(xval)}" cy="${Y(m)}" r="5" fill="${css(COL[name])}"/><text x="${X(xval)+8}" y="${ty}" font-size="13" font-weight="600" fill="${css(COL[name])}">${name} ${m.toFixed(2)}</text>`; } }
+  }
+  s += `<text x="620" y="${Y(0)+16}" font-size="12" text-anchor="end" fill="${css("--muted")}">${unit}</text>`;
+  return s;
+}
+function simDraw(){
+  const t = +$("#temp").value, h = +$("#hum").value; $("#tVal").textContent = t; $("#hVal").textContent = h;
+  const str = RULES.map(([a,b]) => Math.min(T[a](t), b ? H[b](h) : 1));
+  tb.querySelectorAll("tr").forEach((tr,i) => { tr.querySelector(".st").textContent = str[i].toFixed(2); tr.className = str[i] > 0 ? "fired" : "off"; });
+  let out, sv = mfPanel(30, 100, 0, 40, T, t, "1. Fuzzification: temperature", "°C") + mfPanel(185, 100, 0, 100, H, h, "Humidity", "%");
+  const X = v => 60 + v/100*540, y0 = 345, hh = 130, Y = m => y0 + hh - m*hh;
+  sv += `<text x="60" y="${y0-8}" font-size="16" font-weight="700" fill="${css("--ink")}">2–4. Rules → aggregated output → fan speed</text><line x1="60" y1="${Y(0)}" x2="600" y2="${Y(0)}" stroke="${css("--line")}" stroke-width="2"/>`;
+  if (method === "sugeno"){
+    const w = {}; RULES.forEach(([,,c],i) => w[c] = Math.max(w[c]||0, str[i]));
+    let num = 0, den = 0;
+    RULES.forEach(([,,c],i) => { num += str[i]*SUG[c]; den += str[i]; });
+    for (const [c,k] of Object.entries(SUG)) if (w[c]) sv += `<line x1="${X(k)}" y1="${Y(0)}" x2="${X(k)}" y2="${Y(w[c])}" stroke="${css(COL[c])}" stroke-width="6"/><text x="${X(k)}" y="${Y(w[c])-6}" font-size="13" text-anchor="middle" fill="${css(COL[c])}">${c} ${w[c].toFixed(2)}</text>`;
+    out = den ? num/den : null;
+    $("#fanMethod").textContent = "Fan speed (%), weighted average of singletons (Sugeno)";
+  } else {
+    const agg = []; for (let z=0; z<=100; z+=0.5){ let m = 0; RULES.forEach(([,,c],i) => { const v = method==="clip" ? Math.min(str[i], O[c](z)) : str[i]*O[c](z); m = Math.max(m, v); }); agg.push([z,m]); }
+    for (const [name,f] of Object.entries(O)){ let p = ""; for (let z=0; z<=100; z+=1) p += `${X(z)},${Y(f(z))} `; sv += `<polyline points="${p}" fill="none" stroke="${css(COL[name])}" stroke-width="1.5" stroke-dasharray="4 4"/>`; }
+    Object.keys(O).forEach((name,i) => { sv += `<rect x="${430+i*68}" y="${y0-20}" width="14" height="4" fill="${css(COL[name])}"/><text x="${448+i*68}" y="${y0-14}" font-size="13" fill="${css(COL[name])}">${name}</text>`; });
+    sv += `<polygon points="${X(0)},${Y(0)} ${agg.map(([z,m])=>`${X(z).toFixed(1)},${Y(m).toFixed(1)}`).join(" ")} ${X(100)},${Y(0)}" fill="${css("--brand")}" fill-opacity="0.35" stroke="${css("--brand")}" stroke-width="2"/>`;
+    const den = agg.reduce((a,[,m])=>a+m,0); out = den ? agg.reduce((a,[z,m])=>a+z*m,0)/den : null;
+    $("#fanMethod").textContent = "Fan speed (%), centroid of the aggregated set (" + (method==="clip"?"clipping":"scaling") + ")";
+  }
+  if (out !== null){ sv += `<line x1="${X(out)}" y1="${y0-4}" x2="${X(out)}" y2="${Y(0)+6}" stroke="${css("--ink")}" stroke-width="3"/><text x="${X(out)}" y="${Y(0)+22}" font-size="14" font-weight="700" text-anchor="middle" fill="${css("--ink")}">${out.toFixed(1)}%</text>`; }
+  $("#mfSvg").innerHTML = sv; $("#fanOut").textContent = out === null ? "no rule fired" : out.toFixed(1) + "%";
+}
+["#temp","#hum"].forEach(s => $(s).addEventListener("input", simDraw));
+document.querySelectorAll("#methSeg button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#methSeg button").forEach(x => x.setAttribute("aria-pressed", x===b)); method = b.dataset.v; simDraw(); }));
+simDraw();
+
+/* ---------- Tall men ---------- */
+const TALL = [[150,0],[152,0],[155,0.01],[158,0.06],[167,0.15],[172,0.24],[179,0.78],[181,0.82],[198,0.98],[205,1],[210,1]];
+const tallMu = h => { for (let i=1;i<TALL.length;i++){ const [x0,y0]=TALL[i-1],[x1,y1]=TALL[i]; if (h<=x1) return y0+(y1-y0)*(h-x0)/(x1-x0); } return 1; };
+function tallDraw(){
+  const h = +$("#ht").value; $("#htVal").textContent = h;
+  const X = v => 50 + (v-150)/60*550, Y = m => 220 - m*180;
+  let p = ""; for (let v=150; v<=210; v+=0.5) p += `${X(v)},${Y(tallMu(v))} `;
+  const c = h >= 180 ? 1 : 0, f = tallMu(h);
+  $("#tallSvg").innerHTML = `<line x1="50" y1="220" x2="600" y2="220" stroke="${css("--line")}" stroke-width="2"/>
+    <polyline points="${X(150)},${Y(0)} ${X(180)},${Y(0)} ${X(180)},${Y(1)} ${X(210)},${Y(1)}" fill="none" stroke="${css("--muted")}" stroke-width="2.5" stroke-dasharray="8 6"/>
+    <polyline points="${p}" fill="none" stroke="${css("--brand")}" stroke-width="4"/>
+    <line x1="${X(h)}" y1="30" x2="${X(h)}" y2="220" stroke="${css("--ink")}" stroke-width="2"/>
+    <circle cx="${X(h)}" cy="${Y(f)}" r="7" fill="${css("--brand")}"/><circle cx="${X(h)}" cy="${Y(c)}" r="6" fill="none" stroke="${css("--muted")}" stroke-width="3"/>
+    <text x="54" y="${Y(1)-8}" font-size="14" fill="${css("--muted")}">1</text><text x="54" y="${Y(0)-6}" font-size="14" fill="${css("--muted")}">0</text>
+    ${[150,160,170,180,190,200,210].map(v=>`<text x="${X(v)}" y="244" font-size="13" text-anchor="middle" fill="${css("--muted")}">${v}</text>`).join("")}
+    <text x="600" y="24" font-size="14" text-anchor="end" fill="${css("--muted")}">dashed: crisp · solid: fuzzy</text>`;
+  $("#crispOut").textContent = c; $("#fuzzyOut").textContent = f.toFixed(2);
+}
+$("#ht").addEventListener("input", tallDraw); tallDraw();
+
+/* ---------- Hedges ---------- */
+const HEDGES = [["A little","μ^1.3",m=>m**1.3],["Slightly","μ^1.7",m=>m**1.7],["Very","μ²",m=>m**2],["Extremely","μ³",m=>m**3],["Very very","μ⁴",m=>m**4],["More or less / somewhat","√μ",m=>Math.sqrt(m)],["Indeed","2μ² if μ ≤ 0.5; 1 − 2(1 − μ)² otherwise",m=>m<=0.5?2*m*m:1-2*(1-m)**2]];
+function hedgeDraw(){ const h = +$("#h2").value, m = tallMu(h); $("#h2Val").textContent = h;
+  $("#hedgeTable tbody").innerHTML = `<tr><td><b>Tall</b> (no hedge)</td><td>μ</td><td><b>${m.toFixed(2)}</b></td></tr>` + HEDGES.map(([n,f,fn])=>`<tr><td>${n} tall</td><td class="mono">${f}</td><td>${fn(m).toFixed(2)}</td></tr>`).join(""); }
+$("#h2").addEventListener("input", hedgeDraw); hedgeDraw();
+
+/* ---------- Aggregation figure (lecture example) ---------- */
+function aggDraw(){ const X = v => 50 + v*5.5, Y = m => 180 - m*300;
+  $("#aggSvg").innerHTML = `<line x1="50" y1="180" x2="600" y2="180" stroke="${css("--line")}" stroke-width="2"/>
+    <polygon points="${X(0)},${Y(0)} ${X(0)},${Y(0.1)} ${X(24)},${Y(0.1)} ${X(28)},${Y(0.2)} ${X(62)},${Y(0.2)} ${X(68)},${Y(0.5)} ${X(100)},${Y(0.5)} ${X(100)},${Y(0)}" fill="${css("--brand")}" fill-opacity="0.35" stroke="${css("--brand")}" stroke-width="2"/>
+    <line x1="${X(67.4)}" y1="20" x2="${X(67.4)}" y2="188" stroke="${css("--ink")}" stroke-width="3"/><text x="${X(67.4)}" y="206" text-anchor="middle" font-size="14" font-weight="700" fill="${css("--ink")}">COG ≈ 67.4</text>
+    <text x="${X(10)}" y="${Y(0.1)-8}" font-size="13" text-anchor="middle" fill="${css("--muted")}">low 0.1</text><text x="${X(45)}" y="${Y(0.2)-8}" font-size="13" text-anchor="middle" fill="${css("--muted")}">normal 0.2</text><text x="${X(84)}" y="${Y(0.5)-8}" font-size="13" text-anchor="middle" fill="${css("--muted")}">high 0.5</text>
+    <text x="600" y="206" font-size="12" text-anchor="end" fill="${css("--muted")}">risk z (%)</text>`; }
+aggDraw();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { simDraw(); tallDraw(); aggDraw(); });
+
+/* ---------- Numeric exercises ---------- */
+document.querySelectorAll(".chk").forEach(btn => btn.addEventListener("click", () => {
+  const box = btn.closest(".ans"), fb = box.querySelector(".fb"); let ok = true, blank = false;
+  box.querySelectorAll("input[data-check]").forEach(inp => { const v = parseFloat(inp.value); if (isNaN(v)) blank = true; else if (Math.abs(v - +inp.dataset.check) > +inp.dataset.tol + 1e-9) ok = false; });
+  if (blank){ fb.className = "fb wrong"; fb.textContent = "Fill in every box first."; return; }
+  fb.className = "fb " + (ok ? "right" : "wrong"); fb.textContent = ok ? "Correct." : "Not yet. Check your working, or open the worked solution.";
+}));
+
+/* ---------- Multiple-choice checks ---------- */
+const MCQ = {
+  u1:["Which source of uncertainty does fuzzy logic mainly address?",["Unknown data","Imprecise language such as 'often' or 'tall'","Combining the views of experts","Weak implications"],1,"Fuzzy sets turn vague words into degrees of membership."],
+  r1:["A rule has two antecedents joined by OR, with memberships 0.3 and 0.6. Its firing strength is:",["0.3","0.45","0.6","0.9"],2,"OR takes the maximum: max(0.3, 0.6) = 0.6."],
+  b1:["Which step usually takes the most time and needs the most testing?",["Specifying the problem","Choosing the fuzzy set shapes","Evaluating and tuning the system","Typing the rules into MATLAB"],2,"Tuning (adjusting sets, overlaps and rules until the output meets requirements) is the most laborious step."]
+};
+document.querySelectorAll("[data-mcq]").forEach(box => {
+  const [stem, opts, ans, why] = MCQ[box.dataset.mcq];
+  box.innerHTML = `<span class="tag">Quick check</span><p><b>${stem}</b></p><div class="opts">${opts.map((o,i)=>`<button type="button" data-i="${i}">${o}</button>`).join("")}</div><p class="fb" aria-live="polite"></p>`;
+  box.querySelectorAll(".opts button").forEach(b => b.addEventListener("click", () => {
+    const right = +b.dataset.i === ans, fb = box.querySelector(".fb");
+    box.querySelectorAll(".opts button").forEach(x => x.classList.remove("right","wrong")); b.classList.add(right?"right":"wrong");
+    fb.className = "fb " + (right?"right":"wrong"); fb.textContent = right ? "Correct. " + why : "Not quite, try again.";
+  }));
+});
+</script>
+</body>
+</html>
